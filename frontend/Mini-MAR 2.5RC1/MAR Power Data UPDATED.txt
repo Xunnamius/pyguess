@@ -1,0 +1,132 @@
+General Format:
+{
+   'effects':
+      [ ( 'NAME OF EFFECT', INT/FLOAT MODIFIER, (UPGRADE) ) ],
+   'type': INT REPRESENTING TYPE (0 = Offensive, 1 = Defensive, 2 = Utility, 3 = Power Move)
+   'chance':
+      ( CHANCE OF SUCCESS BETWEEN 0.0 AND 1.0, (UPGRADE) ),  
+   'cooldown':( INT/FLOAT COOLDOWN WAIT TIME IN TURNS - OR - STRING COOLDOWN
+               WAIT TIME EQUATION, (UPGRADE) )
+}
+
+In the above JSON structure, UPGRADE stands for:
+
+      A TUPLE (X, Y, z) TRIPLET OF INTS/FLOATS WHERE floor(alottedSP/Y)*X + MODIFIER
+      EQUALS THE EFFECT'S TOTAL IMPACT ON THE GAME. Z REPRESENTS THE MINIMUM/MAXIMUM
+      VALUE THE AFOREMENTIONED EQUATION MAY TAKE. NEGATIVE Z STANDS FOR MINIMUM
+      WHILE POSTIVE Z STANDS FOR MAXIMUM. IF AT ANY POINT
+      EQUATION > Z (WHEN POSITIVE) OR EQUATION < abs(Z (WHEN NEGATIVE)),
+      EQUATION = Z. THIS ACTS AS A CAP ON LEVEL GAINS THROUGHOUT THE GAME,
+
+Note that when using cooldown's "String Equation" feature, the symbol "#"
+(no quotes) represents the result of the equation floor(alottedSP/Y)*X + MODIFIER
+mentioned above. Also note that any negative cooldown (below zero) will be
+interpreted by the program as 'this skill can only be used once'! This also applies
+to the 'duration' effect listed below.
+
+Another note: for things such as modOChance, a sign in front of the modifier means add/subtract from the current norm, while no sign means replace!
+
+And ANOTHER note! [] listed in the cooldowns (description) should be replaced by "Can only be used once" if the applicable number is -1! Otherwise, " turns" should be added to the end of the number. {} should be replaced by type (capitalization). [] should be replaced on a "per-existence" basis (starting with the last two, and then from the top)!
+
+MAR's available effects are as follows:
+winTheGame	- When this effect is encountered, user automatically wins the game
+changeLetter	- Opponent's answer letter is changed randomly to something else
+modTurnCnt	- Modify user's turn count
+modOTurnCnt	- Modify the opponent's turn count
+noSpecials	- User cannot use specials for the specified amount of turns
+noOSpecials	- Opponent cannot use specials for the specified amount of turns
+noOHints	- Opponent will not receive hints as to the location of their answer
+Poison		- Poisons an opponent.
+removePoison	- Stops the poison effect from taking turns.
+revealStats	- Reveal the opponent's turn information to the user for the
+                  specified amount of turns
+modChance	- Modify the user's chance of next special succeeding
+                  (duration must be defined to span multiple turns)
+mod0Chance	- Modify user's chance of next offensive special succeeding
+                  (duration must be defined to span multiple turns)
+mod1Chance	- Modify user's chance of next defensive special succeeding
+                  (duration must be defined to span multiple turns)
+modOChance	- Modify the opponenet's chance of next special succeeding
+                  (duration must be defined to span multiple turns)
+modO0Chance	- Modify user's chance of next offensive special succeeding
+                  (duration must be defined to span multiple turns)
+modO1Chance	- Modify user's chance of next defensive special succeeding
+                  (duration must be defined to span multiple turns)
+duration	- A special modifier used to indicate how long the actions within
+                  the effects braces are affective
+
+
+
+Assassinate:
+{'effects':[('modOTurnCnt', -7, False)], 'type': 0, 'chance':(0.10, (0.01,1,0.60)), 'cooldown':(15, False)}
+
+Mug:
+{'effects':[('modTurnCnt', 1, (1,3,5)), ('modOTurnCnt', -1, (1,3,5))], 'type': 0, 'chance':(0.95, False), 'cooldown':('(#+1)*2', False)}
+
+Smoke Bomb:
+{'effects':[('noOSpecials', 1, False)], 'type': 1, 'chance':(0.95, False), 'cooldown':(5, False)}
+
+Blend:
+{'effects':[('modOChance', -0.50, (-0.05,3,-0.10))], 'type': 1, 'chance':(0.95, False), 'cooldown':(3, False)}
+
+
+
+Heal:
+{'effects':[('modTurnCnt', 4, False)], 'type': 2, 'chance':(0.95, False), 'cooldown':(4, (-1,5,0))}
+
+Cure:
+{'effects':[('removePoison', 0, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(-1, False)}
+
+Poison:
+{'effects':[('poison', 1, (1,2,2)), ('duration', 7, (-1,2,-4))], 'type': 0, 'chance':(1.0, False), 'cooldown':(-1, False)}
+
+Size Up:
+{'effects':[('revealStats', 14, False)], 'type': 2, 'chance':(0.90, False), 'cooldown':(-1, False)}
+
+
+
+Healing Prayer:
+{'effects':[('modTurnCnt', 2, (1,1,7))], 'type': 2, 'chance':(0.90, False), 'cooldown':('#*2+1', False)}
+
+Protection Prayer:
+{'effects':[('modO0Chance', 0.50, (-0.01,1,-0.25))], 'type': 1, 'chance':(0.95, False), 'cooldown':(6, False)}
+
+Divine Mercy:
+{'effects':[('mod0Chance', +0.02, (0.02,1,0.50)), ('mod1Chance', +0.02, (0.02,1,0.50)), ('duration', -1, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(-1, False)}
+
+Divine Judgement:
+{'effects':[('modO0Chance', -0.02, (0.02,1,0.50)), ('modO1Chance', -0.02, (0.02,1,0.50)), ('duration', -1, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(-1, False)}
+
+
+
+Distract:
+{'effects':[('noOSpecials', 2, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(8, (-1,2,-4))}
+
+Confuse:
+{'effects':[('noOHints', 2, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(10, (-1,2,-4))}
+
+Suggestive Dance:
+{'effects':[('changeLetter', 0, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(12, (-1,2,-6))}
+
+Size Up:
+{'effects':[('revealStats', 28, False)], 'type': 2, 'chance':(1.0, False), 'cooldown':(28, False)}
+
+
+
+Power Word: Die:
+{'effects':[('winTheGame', 0, False)], 'type': 3, 'chance':(1.0, False), 'cooldown':(-1, False)}
+
+Power Word: Life:
+{'effects':[('modTurnCnt', 9999, False)], 'type': 3, 'chance':(1.0, False), 'cooldown':(0, False)}
+
+Power Word: Luck:
+{'effects':[('modOChance', 0.10, False), ('modChance', 1.0, False)], 'type': 3, 'chance':(1.0, False), 'cooldown':(0, False)}
+
+Power Word: End:
+{'effects':[('noOSpecials', 9999, False)], 'type': 3, 'chance':(1.0, False), 'cooldown':(0, False)}
+
+Power Word: Skill:
+{'effects':[('noOSpecials', 9999, False), ('noSpecials', 9999, False)], 'type': 3, 'chance':(1.0, False), 'cooldown':(0, False)}
+
+Power Word: Blind:
+{'effects':[('noOHints', 9999, False)], 'type': 3, 'chance':(1.0, False), 'cooldown':(0, False)}
